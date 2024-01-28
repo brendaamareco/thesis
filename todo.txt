@@ -1,0 +1,4 @@
+Para mejorar el pipeline se pueden realizar los siguientes cambios:
+1. Mejorar el setup de la maquina virtual:
+       - agregar el download de Rstudio con un wget del repo correspondiente
+2. Instalar los paquetes de R que se nesesitan, sino da error la primera vez que se ejecutan los scripts stadisticos

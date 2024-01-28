@@ -1,0 +1,34 @@
+##########################################################
+#Import Statements
+##########################################################
+print("--------------------------------")
+print("Step 0: Import statements")
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+       
+##########################################################
+#Global Variables
+##########################################################
+
+data_input_path = \
+    '../0-Data/Anna_finalannotations.csv'
+
+
+data_output_path = \
+    '../0-Data/Anna_finalannotations_no_blanks.csv'
+
+##########################################################
+#Main
+##########################################################
+
+#filtrar
+df = pd.read_csv(data_input_path)
+df_filtered = df[(df['ranking'] = 0) | (df['ranking'] = 1)]
+
+#guardar en el output
+#save our new dataset to a file
+df_filtered.to_csv(data_output_path, index=False, encoding='utf-8-sig')
+
+
+   

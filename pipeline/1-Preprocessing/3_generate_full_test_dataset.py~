@@ -1,0 +1,99 @@
+#####################################################################
+# Add all columns to X_test y_test
+#####################################################################
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+from pandas import DataFrame
+import numpy
+import numpy as np
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import
+
+#####################################################################
+# Global Variables
+#####################################################################
+
+data_input_path = \
+    '../0-Data/Anna_finalannotations_no_blanks_translated.csv'
+
+data_input_path_X_test = \
+    '../0-Data/Anna_finalannotations_no_blanks_translated_X_test.npy'
+data_input_path_y_test = \
+    '../0-Data/Anna_finalannotations_no_blanks_translated_y_test.npy'
+
+data_output_path = \
+    '../0-Data/Anna_finalannotations_no_blanks_translated_predicted_test.csv'
+
+#####################################################################
+# Functions
+#####################################################################
+def build_out_data_frame(df):
+    #input df = pd.DataFrame({'text': X_test, 'class': y_test})
+
+    #open main data set
+    out_data = pd.read_csv(data_input_path)
+    
+    #iterate over Xtest
+    rows = []
+    index = []    
+    for i, row in df.iterrows():
+        complete_row=out_data[(out_data['translated review'] == row['text'])&(out_data['ranking'] == row['class'])].iloc[0]
+        rows.append(complete_row)
+        index.append(i)
+    
+    data_frame = DataFrame(rows, index=index)
+    
+    print('-------------------------')
+    print("Test shape")
+    r, c = df.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    print(df)
+
+    print('-------------------------')
+    print("Complete Test shape")
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    print(data_frame)
+
+    #drop rows with out 'ranking' (is null)
+    #out_data = out_data.dropna(axis=0, subset=['ranking'])
+
+    #check
+    print_basic_statistics(data_frame)    
+    return data_frame
+
+def print_basic_statistics(data_frame):
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    
+
+
+def get_pred_ranking(review, df):
+    if ((review == df['text'])).any():
+        return 1
+    
+
+
+#####################################################################
+# Main
+#####################################################################
+print("--------------------------")
+print("Loading test sets")
+X_test = np.load(data_input_path_X_test, allow_pickle=True)
+y_test = np.load(data_input_path_y_test, allow_pickle=True)
+
+print("X_test.shape")
+print(X_test.shape)
+
+print("--------------------------")
+print("Enrich and filter main dataset")
+data_test = pd.DataFrame({'text': X_test, 'class': y_test})
+out_data=build_out_data_frame(data_test)
+out_data.to_csv(data_output_path, index=False, encoding='utf-8-sig')
+
+
+
+
+

@@ -1,0 +1,169 @@
+##########################################################
+#Import Statements
+##########################################################
+print("--------------------------------")
+print("Step 0: Import statements")
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+       
+##########################################################
+#Global Variables
+##########################################################
+
+#data_input_path1 = \
+#    '../0-Data/1_intermediate_generated_data/data.csv'
+   
+data_input_path1 = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+        
+
+##########################################################
+#Functions
+##########################################################
+def describeunprivilegedatributes():
+    print("--------------------------------")
+    print("Step 1: Load dataset --------------------")
+    print("data_input_path1")
+    data = pd.read_csv(data_input_path1)
+
+    r, c = data.shape
+    print("shape")
+    print("rows "+str(r)+" columns "+str(c))    
+
+    print("--------------------------------")
+    print("describing key atributes")
+    print("--------------------------------")
+
+    print('ranking')
+    info=data['ranking'].value_counts()
+    print(info)
+    info=data['ranking'].describe()
+    print(info)
+
+    print('genderfinal')
+    info=data['genderfinal'].value_counts()
+    print(info)
+    info=data['genderfinal'].describe()
+    print(info)
+
+    print('Country')
+    info=data['Country'].value_counts()
+    print(info)
+    info=data['Country'].describe()
+    print(info)
+
+    print('language')
+    info=data['language'].value_counts()
+    print(info)
+    info=data['language'].describe()
+    print(info)
+
+    print('culturegroup')
+    info=data['culturegroup'].value_counts()
+    print(info)
+    info=data['culturegroup'].describe()
+    print(info)
+   
+    print('culturegroup')
+    info=data['culturegroup'].value_counts()
+    print(info)
+    info=data['culturegroup'].describe()
+    print(info)
+   
+    
+    print("--------------------------------")
+    print("describing goub by atributes")
+    print("--------------------------------")
+    
+
+def describeranking():
+    
+    print("--------------------------------")
+    print("Step 1: Load dataset 1--------------------")
+    data = pd.read_csv(data_input_path1)
+
+    r, c = data.shape
+    print("shape")
+    print("rows "+str(r)+" columns "+str(c))    
+
+
+    info=data['ranking'].value_counts()
+    print('ranking')
+    print(info)
+
+    info=data['ranking'].describe()
+    print(info)
+
+    
+    myFig = plt.figure()
+    bp = data.boxplot(column=['ranking'])
+    myFig.savefig('../0-Data/boxplot-ranking.jpg', format='jpg')
+
+
+def pritnColumnNames():
+    print("--------------------------------")
+    print("Step 1: Load dataset 1--------------------")
+    df1 = pd.read_csv(data_input_path1)
+    print(list(df1.columns))
+#['Date', 'AppID', 'AppName', 'Country', 'Version', 'Author', 'Rating', 'Title', 'Review', 'Translated title', 'Translated review', 'Reply Date', 'Developer Reply', 'User', 'Tags', 'Categories', 'Notes', 'Likes', 'Dislikes', 'Link', 'ReviewID', 'name', 'iat', 'language', 'otherType', 'sentiment', 'gender', 'bugReport', 'supportRequest', 'featureRequest', 'generalComplaint', 'generalPraise', 'noise', 'other', 'name_1', 'iat_1', 'language_1', 'otherType_1', 'sentiment_1', 'gender_1', 'bugReport_1', 'supportRequest_1', 'featureRequest_1', 'generalComplaint_1', 'generalPraise_1', 'noise_1', 'other_1', 'finalannotationcontentcategory', 'finalannotationsentiment', 'finalannotationgender', 'culturegroup', 'UA', 'IDV', 'genderfinal', 'textlength', 'textlength1', 'titlelength1', 'textlength2', 'titlelength', 'convtext', 'convtextlength', 'convtextlength2', 'IDV1', 'UA1', 'avgsentiment', 'usefulcontent1', 'usefulcontent', 'wordlength', 'convtextlength2class', 'textlengthclass', 'wordlengthclass', 'ranking']
+
+
+def basicstatistics():
+    print("--------------------------------")
+    print("Step 1: Load dataset 1--------------------")
+    df1 = pd.read_csv(data_input_path1)
+        
+
+    info=df1['finalannotationsentiment'].value_counts()
+    print('finalannotationsentiment')
+    print(info)
+# 2    858
+# 0    633
+#-1    440
+# 1    330
+#-2    147
+
+    
+    #get list
+    info=df1['finalannotationcontentcategory'].value_counts()
+    print('finalannotationcontentcategory')
+    print(info)
+#Other                                    77
+#isFeatureShortcoming/isFeatureRequest    48
+#isBugReport                              35
+
+    info=df1['Rating'].value_counts()
+    print('Rating')
+    print(info)
+
+    info=df1['Dislikes'].value_counts()
+    print('Dislikes')
+    print(info)
+
+    info=df1['Likes'].value_counts()
+    print('Likes')
+    print(info)
+
+    info=df1['Likes'].sum()
+    print('totalLikes')
+    print(info)
+
+    info=df1['language'].value_counts()
+    print('language')
+    print(info)
+    
+    info=df1['ranking'].value_counts()
+    print('ranking')
+    print(info)
+    
+
+##########################################################
+#Main
+##########################################################
+#culturalgroupsandcountries()
+#basicstatistics()
+describeunprivilegedatributes()
+#describeranking()
+#pritnColumnNames()
+

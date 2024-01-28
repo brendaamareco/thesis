@@ -1,0 +1,119 @@
+#----------------------------------
+#--INSTALL Debian an Dropbox
+#----------------------------------
+Install debian over a 3 processors virtual machine
+https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/
+
+Install Dropbox
+https://linuxhint.com/install_dropbox_debian_10/
+
+#----------------------------------
+#--INSTALL R and Rstudio
+#----------------------------------
+sudo apt-get install r-base
+sudo apt install -y ./rstudio-lastversion-amd64.deb 
+
+
+#----------------------------------
+#--INSTALL Python
+#----------------------------------
+
+Install library for gui plots before installing Python
+sudo apt-get install python3-tk
+sudo apt-get install tk-dev
+
+Install Python 3.9.7
+https://linuxways.net/debian/how-to-install-python-3-9-on-debian-11/
+sudo apt update
+sudo apt install build-essential libncurses5-dev zlib1g-dev libnss3-dev libgdbm-dev libssl-dev libsqlite3-dev libffi-dev libreadline-dev curl libbz2-dev
+sudo apt-get install wget
+sudo wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
+tar -xvf Python-3.9.7.tgz
+cd Python-3.9.7
+./configure --enable-optimizations
+make -j 3 #The -j option specifies the number of CPU cores.
+sudo make altinstall
+python3.9 --version
+
+
+Install and upgrade pip3
+sudo apt install python3-pip
+python3.9 -m pip install --upgrade pip
+pip3 --version
+
+Install idle to launch python GUI under virtual env
+sudo apt-get install idle-python3.9
+
+Install virtualenvironmente with pip
+sudo apt-get install python3-venv
+
+#----------------------------------
+#--CREATE new virtualenv
+#----------------------------------
+Create a test virtual environment
+python3 -m venv test1
+
+#----------------------------------
+#--ACTIVATE your already created virtualenv
+#----------------------------------
+cd test1
+source bin/activate
+
+#----------------------------------
+#--WORKING with already activated virtualenv
+#----------------------------------
+Work in your new python virtual environment
+(test1) python3.9 --version
+Python 3.9.7
+(test1) pip3 --version
+pip 21.2.3 
+(test1) pip3 install pandas
+(test1) pip3 freeze
+numpy==1.22.3
+pandas==1.4.1
+python-dateutil==2.8.2
+pytz==2022.1
+six==1.16.0
+
+(test1) python3.9 add_ranking.py #to run a python script
+
+(test1) python3.9 -m idlelib.idle
+** IDLE can't import Tkinter.
+Your Python may not be configured for Tk. **
+
+#----------------------------------
+#--CHAU virtualenv
+#----------------------------------
+(test1) deactivate #to exit our virtualenv
+
+
+#----------------------------------
+#--Requirements
+#----------------------------------
+pip3 install pandas 
+pip3 install numpy 
+pip3 install nltk 
+pip3 install wheel
+pip3 install sklearn 
+pip3 install matplotlib  
+pip3 install aif360 
+pip3 install 'aif360[LawSchoolGPA]'
+
+pip3 install tempeh 
+pip3 install tensorflow 
+pip3 install fairlearn 
+
+#----------------------------------
+#open R scripts in Statistics and let Rstudio Install required libraries
+
+
+#----------------------------------
+#--Error handling
+#----------------------------------
+ModuleNotFoundError: No module named 'pandas'
+to solve this error execute in the virtual env: pip3 install pandas 
+
+
+
+
+

@@ -1,0 +1,169 @@
+#####################################################################
+# Add all columns from original data to (X_test y_test)
+#####################################################################
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+from pandas import DataFrame
+import numpy
+import numpy as np
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import
+
+#####################################################################
+# Global Variables
+#####################################################################
+data_input_path = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+
+data_input_path_X_test = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_test.npy'
+data_input_path_y_test = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_test.npy'
+data_output_path = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_predicted_test.csv'
+
+
+data_input_path_X_train = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_train.npy'
+data_input_path_y_train = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_train.npy'
+data_output_path2 = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_train.csv'
+
+#####################################################################
+# Functions
+#####################################################################
+def build_out_data_frame(df):
+    #input df = pd.DataFrame({'text': X_test, 'class': y_test})   
+    #open main data set
+    out_data = pd.read_csv(data_input_path)
+    
+    #print_basic_statistics(df)
+    #print_basic_statistics(out_data)
+    #input("guachin")
+
+    #-------------------------------------------
+    #ensure there is no duplicates
+    #-------------------------------------------
+    #col_list = out_data['preprocessed_review'].tolist()
+    #import collections
+    #print("list of duplicated comments")
+    #print([(item,count) for item, count in collections.Counter(col_list).items() if count > 1])
+    #input("press key")
+
+    #iterate over Xtest
+    rows = []
+    index = []
+    count=0    
+    for i, row in df.iterrows():
+        #print(i)
+        #print(row['text']) 
+        #print(row['class'])         
+        #complete_row=out_data[(out_data['preprocessed_review'] == row['text'])&(out_data['ranking'] == row['class'])].iloc[0]
+        complete_row=out_data[out_data['preprocessed_review'] == row['text']].iloc[0]
+        
+        #-------------------------------------------
+        #ensure smote row and original data coincide
+        #-------------------------------------------
+        c=row['class']
+        #print(type(c)) #<class 'float'>
+        c=int(c)
+        #print(type(c)) #<class 'float'>
+        #print(c)
+        
+        ranking_column=31
+        r=int(complete_row[ranking_column]) #ranking column <class 'numpy.int64'>         
+        #print(type(r)) 
+        #print(r) 
+        if(not c==r):
+            count=count+1
+            complete_row[ranking_column]=c #ensure the smote generated data on the output file       
+        
+        rows.append(complete_row)
+        index.append(i)
+        
+    if(count > 0):
+        print(count)
+        print("Warning: smote ytrain do not coincide with original data, its ok according to paper")
+        print("https://arxiv.org/abs/1106.1813")
+
+    data_frame = DataFrame(rows, index=index)
+    
+    #print('-------------------------')
+    #print("Test shape")
+    #r, c = df.shape
+    #print("rows "+str(r)+" columns "+str(c))    
+    #print(df)
+
+    #print('-------------------------')
+    #print("Complete Test shape")
+    #r, c = data_frame.shape
+    #print("rows "+str(r)+" columns "+str(c))    
+    #print(data_frame)
+
+    #drop rows with out 'ranking' (is null)
+    #out_data = out_data.dropna(axis=0, subset=['ranking'])
+
+    #check
+    #print_basic_statistics(data_frame)    
+    return data_frame
+
+def print_basic_statistics(data_frame):
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    
+
+
+def get_pred_ranking(review, df):
+    if ((review == df['text'])).any():
+        return 1
+    
+
+
+#####################################################################
+# enrich test
+#####################################################################
+print("--------------------------")
+print("Loading test sets")
+X_test = np.load(data_input_path_X_test, allow_pickle=True)
+y_test = np.load(data_input_path_y_test, allow_pickle=True)
+
+print("X_test.shape")
+print(X_test.shape)
+
+print("--------------------------")
+print("Enrich and filter main dataset")
+data_test = pd.DataFrame({'text': X_test, 'class': y_test})
+out_data=build_out_data_frame(data_test)
+out_data.to_csv(data_output_path, index=False, encoding='utf-8-sig')
+
+
+#####################################################################
+# enrich Train
+#####################################################################
+
+print("--------------------------")
+print("Loading train sets")
+X_train = np.load(data_input_path_X_train, allow_pickle=True)
+y_train = np.load(data_input_path_y_train, allow_pickle=True)
+
+#print("X_train.shape")
+#print(X_train.shape)
+
+#print("y_train.shape")
+#print(y_train.shape)
+
+
+print("--------------------------")
+print("Enrich and filter main train dataset")
+data_train = pd.DataFrame({'text': X_train, 'class': y_train})
+
+
+out_data=build_out_data_frame(data_train)
+out_data.to_csv(data_output_path2, index=False, encoding='utf-8-sig')
+
+
+
+

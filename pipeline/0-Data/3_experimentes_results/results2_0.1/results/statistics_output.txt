@@ -1,0 +1,9 @@
+[1] "table country"
+
+     Australia         Canada      Hong Kong          India      Singapore 
+            20             20             20             20             20 
+  South Africa United Kingdom  United States 
+            20             20             20 
+< table of extent 0 >
+< table of extent 0 >
+< table of extent 0 x 0 >

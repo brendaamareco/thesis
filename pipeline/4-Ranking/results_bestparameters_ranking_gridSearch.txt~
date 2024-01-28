@@ -1,0 +1,194 @@
+--------------------------
+Setting pipeline with the classifier
+Multinomial NB
+--------------------------
+Setting parameter set
+--------------------------
+Loading training and test sets
+--------------------------
+Grid Search
+--------------------------
+Fit
+--------------------------
+Results
+done in 170.10239672660828s
+Best score: 0.7605648893463869
+--------------------------
+Best parameters set:
+	clf__alpha: 1
+	vec__binary: False
+	vec__lowercase: True
+	vec__max_df: 0.5
+	vec__max_features: None
+	vec__ngram_range: (1, 1)
+	vec__stop_words: None
+--------------------------
+Predictions:
+              precision    recall  f1-score   support
+
+         0.0       0.82      0.75      0.79       506
+         1.0       0.84      0.89      0.86       731
+
+    accuracy                           0.83      1237
+   macro avg       0.83      0.82      0.82      1237
+weighted avg       0.83      0.83      0.83      1237
+
+
+real	2m51.192s
+user	22m20.440s
+sys	0m16.022s
+
+--------------------------
+Setting pipeline with the classifier
+Random Forest
+--------------------------
+Setting parameter set
+--------------------------
+Loading training and test sets
+--------------------------
+Grid Search
+--------------------------
+Fit
+--------------------------
+Results
+done in 4200.875252008438s
+Best score: 0.7448538111986024
+--------------------------
+Best parameters set:
+	clf__n_estimators: 200
+	vec__binary: False
+	vec__max_df: 0.875
+	vec__max_features: 10000
+	vec__ngram_range: (1, 3)
+	vec__stop_words: None
+--------------------------
+Predictions:
+              precision    recall  f1-score   support
+
+         0.0       0.74      0.81      0.77       506
+         1.0       0.86      0.80      0.83       731
+
+    accuracy                           0.80      1237
+   macro avg       0.80      0.80      0.80      1237
+weighted avg       0.81      0.80      0.80      1237
+
+
+real	70m7.447s
+user	557m55.197s
+sys	0m12.146s
+
+--------------------------
+Setting pipeline with the classifier
+Decision Tree
+--------------------------
+Setting parameter set
+--------------------------
+Loading training and test sets
+--------------------------
+Grid Search
+--------------------------
+Fit
+--------------------------
+Results
+done in 762.5590476989746s
+Best score: 0.6830149081301482
+--------------------------
+Best parameters set:
+	clf__max_depth: 28
+	clf__min_samples_leaf: 1
+	clf__min_samples_split: 2
+	vec__binary: True
+	vec__max_df: 0.5
+	vec__max_features: 5000
+	vec__ngram_range: (1, 2)
+	vec__stop_words: None
+--------------------------
+Predictions:
+              precision    recall  f1-score   support
+
+         0.0       0.62      0.82      0.71       506
+         1.0       0.84      0.66      0.74       731
+
+    accuracy                           0.72      1237
+   macro avg       0.73      0.74      0.72      1237
+weighted avg       0.75      0.72      0.73      1237
+
+
+real	12m49.080s
+user	100m46.615s
+sys	0m39.022s
+
+--------------------------
+Setting pipeline with the classifier
+SVC
+--------------------------
+Setting parameter set
+--------------------------
+Loading training and test sets
+--------------------------
+Grid Search
+--------------------------
+Fit
+--------------------------
+Results
+done in 47.809126138687134s
+Best score: 0.7587693729567606
+--------------------------
+Best parameters set:
+	vec__binary: True
+	vec__max_df: 0.5
+	vec__max_features: 5000
+	vec__ngram_range: (1, 2)
+	vec__stop_words: None
+--------------------------
+Predictions:
+              precision    recall  f1-score   support
+
+         0.0       0.84      0.73      0.78       506
+         1.0       0.83      0.90      0.87       731
+
+    accuracy                           0.83      1237
+   macro avg       0.84      0.82      0.82      1237
+weighted avg       0.83      0.83      0.83      1237
+
+
+real	0m54.464s
+user	6m17.284s
+sys	0m3.240s
+
+--------------------------
+Setting pipeline with the classifier
+multi-layer perceptron (MLP)
+--------------------------
+Results
+done in 1601.7795641422272s
+Best score: 0.765267416806593
+--------------------------
+Best parameters set:
+	clf__alpha: 1
+	vec__binary: False
+	vec__max_df: 0.875
+	vec__max_features: None
+	vec__ngram_range: (1, 1)
+	vec__stop_words: None
+--------------------------
+--------------------------
+Fit and predict
+--------------------------
+Precision - Recall
+              precision    recall  f1-score   support
+
+         0.0       0.79      0.81      0.80       506
+         1.0       0.87      0.85      0.86       731
+
+    accuracy                           0.84      1237
+   macro avg       0.83      0.83      0.83      1237
+weighted avg       0.84      0.84      0.84      1237
+
+--------------------------
+
+
+real	26m48.212s
+user	204m46.664s
+sys	5m48.431s
+

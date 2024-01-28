@@ -1,0 +1,74 @@
+#!/bin/bash
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+#data_input_path = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed.csv'
+data_output_path_X_train='../0-Data/Anna_finalannotations_translated_preprocessed_X_train.npy'
+data_output_path_y_train='../0-Data/Anna_finalannotations_translated_preprocessed_y_train.npy'
+data_output_path_X_test='../0-Data/Anna_finalannotations_translated_preprocessed_X_test.npy'
+data_output_path_y_test='../0-Data/Anna_finalannotations_translated_preprocessed_y_test.npy'
+
+rm $data_output_path_X_train
+rm $data_output_path_y_train
+rm $data_output_path_X_test
+rm $data_output_path_y_test
+python3.9 3_split_train_test.py 
+#class/number of instances:
+#1    1465
+#0    1008
+#X_train.shape (1236,)
+#X_test.shape (1237,)
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+#data_input_path_X_train = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed_X_train.npy'
+#data_input_path_y_train = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed_y_train.npy'
+
+data_output_path_X_train='../0-Data/Anna_finalannotations_translated_preprocessed_smote_X_train.npy'
+data_output_path_y_train='../0-Data/Anna_finalannotations_translated_preprocessed_smote_y_train.npy'
+
+rm $data_output_path_X_train
+rm $data_output_path_y_train
+python3.9 4_smote.py
+
+#X_train.shape (1236, 3933)
+#Before OverSampling, counts of label '1': 751
+#Before OverSampling, counts of label '0': 485 
+
+#After OverSampling, the shape of train_X: (1502, 3934)
+#After OverSampling, counts of label '1': 751
+#After OverSampling, counts of label '0': 751
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+#data_input_path = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed.csv'
+#data_input_path_X_test = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed_X_test.npy'
+#data_input_path_y_test = \
+#    '../0-Data/Anna_finalannotations_translated_preprocessed_y_test.npy'
+
+data_output_path='../0-Data/Anna_finalannotations_translated_preprocessed_predicted_test.csv'
+rm $data_output_path
+python3.9 5_generate_full_test_dataset.py
+
+#Complete Test shape
+#rows 1237 columns 76
+#                     Date  ...  length of review
+#0     2019-11-20 16:36:53  ...                22
+#1     2020-01-05 15:59:33  ...                15
+#...                   ...  ...               ...
+#1235  2019-09-28 06:17:29  ...                27
+#1236  2019-10-16 16:16:21  ...                20
+#
+#[1237 rows x 76 columns]
+
+
+

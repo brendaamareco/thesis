@@ -1,0 +1,76 @@
+#####################################################################
+# Join
+#####################################################################
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+
+#####################################################################
+# Global Variables
+#####################################################################
+
+data_input_path1 = \
+    '../0-Data/Anna_finalannotations_no_blanks.csv'
+
+data_input_path2 = \
+    '../0-Data/concat_files_all_translated_reviews.csv'
+
+data_output_path = \
+    '../0-Data/Anna_finalannotations_no_blanks_translated.csv'
+
+
+
+#####################################################################
+# Functions
+#####################################################################
+def merge(reviewID,Review,language):
+    if language=="English":
+        translated_review=Review
+    else:
+        df = pd.read_csv(data_input_path2)
+        row=df[df.ReviewID == reviewID]
+        translated_review=row['translated review']
+        translated_review_list=translated_review.tolist()
+        if len(translated_review_list)>0:
+            translated_review=translated_review_list[0] #to get only the string    
+        else:
+            translated_review="no translated"        
+    
+    return translated_review
+
+def print_basic_statistics(data_frame):
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+
+
+#####################################################################
+# Main
+#####################################################################
+data = pd.read_csv(data_input_path1)
+
+#check
+print_basic_statistics(data)
+
+
+#now we add a new column
+data['translated review'] = data.apply(lambda x: merge(x['ReviewID'],x['Review'],x['language']), axis=1)
+#data['translated review'] = data['Review'] 
+#save our new dataset to a file
+df= pd.DataFrame(data)
+
+#check
+print_basic_statistics(df)
+
+print("translated review")
+info=(df['translated review'].values == 'no translated').sum()    
+print(info)
+
+info=df['translated review'].describe()
+print(info)
+
+
+#Save to an output file
+df.to_csv(data_output_path, index=False, encoding='utf-8-sig')
+

@@ -1,0 +1,9 @@
+﻿dataset,privileged,ranking,Mitigation-technique,Disparate-impact,Bias-d,Statistical-parity,Bias-s,comments
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", Australia",rank107733,,0.6923076923076923,True,-0.2,True,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", Canada",rank107733,,2.0285714285714285,-,0.2571428571428571,-,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", Hong Kong",rank107733,,0.8441558441558441,-,-0.0857142857142857,-,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", India",rank107733,,0.8441558441558441,-,-0.0857142857142857,-,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", Singapore",rank107733,,0.7619047619047619,True,-0.1428571428571428,True,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", South Africa",rank107733,,1.408163265306123,-,0.1428571428571429,-,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", United Kingdom",rank107733,,0.9428571428571428,-,-0.0285714285714285,-,
+../0-Data/1_intermediate_generated_data/annotated_ranking_dataset_binarized.csv,", United States",rank107733,None,1.4081632653061227,-,0.1428571428571429,-,

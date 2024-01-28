@@ -1,0 +1,54 @@
+------------------------------------------------
+1 - Preprocessing
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/1-Preprocessing
+no full preprocessing carried out
+------------------------------------------------
+2 - Feature Extracion
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/2-FeatureExtraction
+no feature extration carried out
+------------------------------------------------
+4 - Ranking
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/4-Ranking
+working with annotated ranking dataset
+perform rankingFunciondePesos
+Using features:  ['CATEGORY', 'SENTIMENT', 'SCORE', 'ENTROPY']
+Using decimal precision: 0.1
+Number of combinations found:  286
+------------------------------------------------
+5-QualityTesting
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/5-QualityTesting
+perform evaluarNDCG
+--------------------------------------------------
+Load dataset 
+--------------------------------------------------
+Perfect ranking ----------------------------------
+dcg_score: 41.48105344537508
+ndcg_score: 1.0000000000000002
+--------------------------------------------------
+Alertme normalizado ranking -------------------------------------
+dcg_score: 39.170176161868596
+ndcg_score: 0.9442907763528814
+--------------------------------------------------
+Ranking con Funcion de pesos
+Best ranking based on ndcg_score: 
+RankingID: rank181, ndcg: 0.9792209192915474
+--------------------------------------------------
+------------------------------------------------
+6-BiasTesting
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/6-BiasTesting
+no biasTesting carried out
+------------------------------------------------
+7-Statistics
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/7-Statistics
+Saving 7 x 7 in image
+End of experiment 2
+
+real	0m4.267s
+user	0m4.959s
+sys	0m0.987s

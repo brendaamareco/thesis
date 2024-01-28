@@ -1,0 +1,247 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+from collections import Counter
+import numpy as np
+
+#####################################################################
+# Global Variables
+#####################################################################
+
+
+data_input_path_X_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_smote_X_train.npy'
+data_input_path_y_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_smote_y_train.npy'
+
+data_input_path_X_test = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_X_test.npy'
+data_input_path_y_test = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_y_test.npy'
+
+
+#classifier="MNB" #Multinomial Naive Bayes 2m54.951s
+#classifier="RF" #Random Forest 70m7.447s
+#classifier="DT" #"Decision Tree") 12m49.080s 
+#classifier="SVC" #Support Vector Machine 0m55.368s
+classifier="MLP" #MultiLayerPerceptron 30m35.636s
+
+
+#hyperparameter_optimizers="GridSearch"
+hyperparameter_optimizers="HalvingGridSearch"
+
+
+
+#####################################################################
+# Functions
+#####################################################################
+
+
+#####################################################################
+# Main
+#####################################################################
+
+import numpy
+import os
+from pandas import DataFrame
+from sys import argv
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.base import TransformerMixin
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV #from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import train_test_split
+ 
+print("--------------------------")
+print("Setting pipeline with the classifier")
+#https://medium.com/@baemaek/text-mining-preprocess-and-naive-bayes-classifier-da0000f633b2
+#https://scikit-learn.org/stable/modules/feature_extraction.html
+#http://michael-harmon.com/blog/NLP2.html plot parameter search results
+#https://towardsdatascience.com/machine-learning-nlp-text-classification-using-scikit-learn-python-and-nltk-c52b92a7c73a stemmed count vectorizer
+
+if classifier=="RF":
+    print("Random Forest")
+    cls_class=RandomForestClassifier()
+elif classifier=="MNB":
+    print("Multinomial NB")
+    cls_class=MultinomialNB()
+elif classifier=="DT":
+    print("Decision Tree")
+    cls_class=DecisionTreeClassifier()
+elif classifier=="SVC":
+    print("SVC")
+    cls_class=SVC()
+elif classifier=="MLP":
+    print("multi-layer perceptron (MLP)")
+    from sklearn.neural_network import MLPClassifier
+    cls_class=MLPClassifier()
+
+
+
+# Pipeline
+pipeline = Pipeline([
+#('vec',  CountVectorizer(encoding='utf-8-sig')),
+('vec', TfidfVectorizer(encoding='utf-8-sig')),
+('clf',  cls_class) 
+])
+
+
+print("--------------------------")
+print("Setting parameter set")
+
+if classifier=="RF":
+    # Parameters for optimization of RF
+    parameters = {
+    'vec__max_df': (0.5, 0.625, 0.75, 0.875, 1.0),
+    'vec__max_features': (None, 5000, 10000, 20000),
+    'vec__ngram_range': ((1, 1), (1, 2), (1, 3)),
+    'vec__binary': (True, False),
+    'vec__stop_words': (None, 'english'),
+    'clf__n_estimators': (100, 200, 500),
+    #'clf__max_features': ('auto', 'sqrt', 'log2') deprecated param default values is sqrt
+    }
+elif classifier=="MNB":
+    # Parameters for optimization of MNB-
+    parameters = {
+    'clf__alpha': (1, 0.1, 0.01, 0.001, 0.0001, 0.00001),
+    'vec__binary': (True, False),
+    'vec__lowercase': (True, False),
+    'vec__max_df': (0.5, 0.625, 0.75, 0.875, 1.0),
+    'vec__max_features': (None, 5000, 10000, 20000),
+    'vec__ngram_range': ((1, 1), (1, 2), (1, 3)),
+    'vec__stop_words': (None, 'english'),
+    #'tfidf__ngram_range': [(1,1), (1,2)],
+    #'tfidf__stop_words': [None, 'english'],
+    #'tfidf__use_idf': [True, False],
+    }    
+#TODO: see other parameters     
+elif classifier=="DT":
+    # Parameters for optimization of DT
+    parameters = {
+    'vec__max_df': (0.5, 0.625, 0.75, 0.875, 1.0),
+    'vec__max_features': (None, 5000, 10000, 20000),
+    'vec__ngram_range': ((1, 1), (1, 2), (1, 3)),
+    'vec__binary': (True, False),
+    'vec__stop_words': (None, 'english'),
+    'clf__max_depth': list(range(2, 30)),
+    'clf__min_samples_split': (2,),
+    'clf__min_samples_leaf': (1,)
+    }
+elif classifier=="SVC":
+    # Parameters for optimization of SVM
+    parameters = {
+    'vec__max_df': (0.5, 0.625, 0.75, 0.875, 1.0),
+    'vec__max_features': (None, 5000, 10000, 20000),
+    'vec__ngram_range': ((1, 1), (1, 2), (1, 3)),
+    'vec__binary': (True, False),
+    'vec__stop_words': (None, 'english'),
+    #'clf__C': C_range.tolist(),
+    #'clf__gamma': gamma_range.tolist()
+    }
+elif classifier=="MLP":
+    parameters = {
+    'vec__max_df': (0.5, 0.625, 0.75, 0.875, 1.0),
+    'vec__max_features': (None, 5000, 10000, 20000),
+    'vec__ngram_range': ((1, 1), (1, 2), (1, 3)),
+    'vec__binary': (True, False),
+    'vec__stop_words': (None, 'english'),
+    'clf__alpha': (1, 0.1, 0.01, 0.001, 0.0001, 0.00001),
+    #'clf__C': C_range.tolist(),
+    #'clf__gamma': gamma_range.tolist()
+    }
+    #print(MLPClassifier().get_params().keys())
+    #dict_keys([  
+    #'activation', 
+    #'alpha', 
+    #'batch_size', 
+    #'beta_1', 'beta_2', 'early_stopping', 'epsilon', 
+    #'hidden_layer_sizes', 
+    #'learning_rate', 
+    #'learning_rate_init', 
+    #'max_fun', 'max_iter', 'momentum', 'n_iter_no_change', 
+    #'nesterovs_momentum', 'power_t', 
+    #'random_state', 
+    #'shuffle', 'solver', 'tol', 'validation_fraction', 'verbose', 
+    #'warm_start'])
+    #https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html
+    #perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (200) reached and the optimization hasn't converged yet.
+
+
+
+from sklearn.metrics import classification_report
+print("--------------------------")
+print("Loading training and test sets")
+X_train = np.load(data_input_path_X_train, allow_pickle=True)
+X_test = np.load(data_input_path_X_test, allow_pickle=True)
+y_train = np.load(data_input_path_y_train, allow_pickle=True)
+y_test = np.load(data_input_path_y_test, allow_pickle=True)
+#TODO: what is allow_pickle
+
+from time import time
+print("--------------------------")
+print("Grid Search")
+if hyperparameter_optimizers=="GridSearch":
+    grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=0, scoring='f1_macro')
+elif hyperparameter_optimizers=="HalvingGridSearch":
+    # explicitly require this experimental feature
+    from sklearn.experimental import enable_halving_search_cv # noqa
+    # now you can import normally from model_selection
+    from sklearn.model_selection import HalvingGridSearchCV
+    from sklearn.model_selection import RandomizedSearchCV
+    #grid_search = HalvingGridSearchCV(pipeline, parameters, n_jobs=-1, verbose=0, scoring='f1_macro')
+    grid_search = RandomizedSearchCV(pipeline, parameters, n_jobs=-1, verbose=0, scoring='f1_macro')
+
+
+
+t0 = time()
+#Modeling Pipeline Optimization With scikit-learn
+#https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
+
+
+print("--------------------------")
+print("Fit")
+grid_search.fit(X_train, y_train)
+
+print("--------------------------")
+print("Results")
+print("done in {0}s".format(time() - t0))
+print("Best score: {0}".format(grid_search.best_score_))
+
+print("--------------------------")
+print("Best parameters set:")
+best_parameters = grid_search.best_estimator_.get_params()
+for param_name in sorted(list(parameters.keys())):
+    print("\t{0}: {1}".format(param_name, best_parameters[param_name]))
+
+print("--------------------------")
+print("Predictions:")
+predictions = grid_search.predict(X_test)
+print(classification_report(y_test, predictions))
+
+
+#Modeling Pipeline Optimization With scikit-learn
+#Use set_params() in case we want to test tweaking any individual parameters individually
+#https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
+
+#import library
+import pyttsx3
+#sudo apt install python3-pyaudio
+#sudo apt install espeak
+#engine setup
+engine = pyttsx3.init()
+#converting text to speech
+engine.say("Hola Luci, hola Andrew, your program is finished. Lets see the results. Come on, Come on")
+engine.runAndWait()
+
+
+
+
+
+

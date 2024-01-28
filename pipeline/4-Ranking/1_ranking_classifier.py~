@@ -1,0 +1,289 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+from collections import Counter
+import numpy as np
+
+#####################################################################
+# Global Variables
+#####################################################################
+
+
+#classifier="MNB" #Multinomial Naive Bayes
+#classifier="RF" #Random Forest
+#classifier="DT" #"Decision Tree")
+#classifier="SVC" #Support Vector Machine
+#classifier="MLP" #MultiLayerPerceptron
+
+classifier_list=['MNB', 'RF', 'SVC', 'DT', 'MLP']
+classifier='' #it becomes instantiated in main below
+
+data_input_path_X_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_X_train.npy'
+data_input_path_y_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_y_train.npy'
+
+data_input_path_X_test = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_X_test.npy'
+data_input_path_y_test = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_y_test.npy'
+
+data_input_output_path = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_predicted_test.csv'
+
+
+
+#####################################################################
+# Functions
+#####################################################################
+def build_out_data_frame(df):
+    #input df = pd.DataFrame({'text': X_test, 'class': y_test, 'pred': y_pred})
+
+    #setting column to write
+    if classifier=="RF":
+        predicted_column='ranking_RF'
+    elif classifier=="MNB":
+        predicted_column='ranking_MNB'
+    elif classifier=="DT":
+        predicted_column='ranking_DT'
+    elif classifier=="SVC":
+        predicted_column='ranking_SVC'
+    elif classifier=="MLP":
+        predicted_column='ranking_MLP'
+
+
+    #open main data set
+    out_data = pd.read_csv(data_input_output_path)
+    
+    #iterate over Xtest
+    rows = []
+    index = []    
+    for i, row in df.iterrows():
+        complete_row=out_data[(out_data['preprocessed_review'] == row['text'])&(out_data['ranking'] == row['class'])].iloc[0]
+        complete_row[predicted_column]=row['pred']
+        rows.append(complete_row)
+        index.append(i)
+    
+    data_frame = DataFrame(rows, index=index)
+    
+    #print('-------------------------')
+    #print("Test shape")
+    #r, c = df.shape
+    #print("rows "+str(r)+" columns "+str(c))    
+    #print(df)
+
+    #print('-------------------------')
+    #print("Complete Test shape")
+    #r, c = data_frame.shape
+    #print("rows "+str(r)+" columns "+str(c))    
+    #print(data_frame)
+
+    #drop rows with out 'ranking' (is null)
+    #out_data = out_data.dropna(axis=0, subset=['ranking'])
+
+    #check
+    print_basic_statistics(data_frame)    
+    return data_frame
+
+def print_basic_statistics(data_frame):
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    
+
+
+def get_pred_ranking(review, df):
+    if ((review == df['text'])).any():
+        return 1
+    
+    
+def __build_out_data_frame(df):
+    #write predicted ranking in main dataset
+    #input df = pd.DataFrame({'text': X_test, 'class': y_pred})
+
+   
+    #open main data set
+    out_data = pd.read_csv(data_input_output_path)
+    #clear column just in case of a previous execution
+    out_data = out_data.drop([predicted_column], axis=1)
+    #write ranking according to df
+    out_data[predicted_column] = out_data.apply(lambda x: get_pred_ranking(x['preprocessed_review'],df), axis=1)
+
+    #drop rows with out ranking (is null)
+    out_data = out_data.dropna(axis=0, subset=[predicted_column])
+
+    #check
+    #print_basic_statistics(out_data)
+    #print('ranking_'+predicted_column+'/number of instances:')        
+    #info=out_data[predicted_column].value_counts()
+    #print(info)
+    return out_data
+
+
+def get_pred_ranking(review, df):
+    #input:df should be a dataframe with two columns: text and class
+    #TODO, it wul be more efficient look for predicted reviews against the entire dataset
+    if ((review == df['text'])).any():
+        row=df[df['text'] == review].iloc[0]
+        return row['class']
+    
+
+def print_basic_statistics(data_frame):
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    
+#####################################################################
+# Classifer Function
+#####################################################################
+import numpy
+import os
+from pandas import DataFrame
+from sys import argv
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.base import TransformerMixin
+from sklearn.tree import DecisionTreeClassifier
+
+from sklearn.model_selection import GridSearchCV #from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import train_test_split
+
+
+def execute_classifer(classifier):
+    print("--------------------------")
+    print("Setting pipeline with the classifier")
+
+    if classifier=="RF":
+        print("Random Forest")
+        cls_class=RandomForestClassifier()
+    elif classifier=="MNB":
+        print("Multinomial NB")
+        cls_class=MultinomialNB()
+    elif classifier=="DT":
+        print("Decision Tree")
+        cls_class=DecisionTreeClassifier()
+    elif classifier=="SVC":
+        print("SVC")
+        cls_class=SVC()
+    elif classifier=="MLP":
+        print("multi-layer perceptron (MLP)")
+        from sklearn.neural_network import MLPClassifier
+        cls_class=MLPClassifier()
+
+    # Pipeline
+    pipeline = Pipeline([
+    #('vec',  CountVectorizer(encoding='utf-8-sig')),
+    ('vec', TfidfVectorizer(encoding='utf-8-sig')),
+    ('clf',  cls_class)
+    ])
+
+
+    #print("--------------------------")
+    #print("Setting parameter set")
+
+    if classifier=="RF":
+        # Parameters for optimization of RF
+        best_parameters = {
+	    'clf__n_estimators': 200,
+	    'vec__binary': False,
+	    'vec__max_df': 0.875,
+	    'vec__max_features': 10000,
+	    'vec__ngram_range': (1, 3),
+	    'vec__stop_words': None,
+        }
+    elif classifier=="MNB":
+        # Parameters for optimization of MNB-
+        best_parameters = {
+        'clf__alpha': 1,
+	    'vec__binary': False,
+	    'vec__lowercase': True,
+	    'vec__max_df': 0.5,
+	    'vec__max_features': None,
+	    'vec__ngram_range': (1, 1),
+	    'vec__stop_words': None,
+	    }    
+    elif classifier=="DT":
+        # Parameters for optimization of DT
+        best_parameters = {
+        'clf__max_depth': 28,
+	    'clf__min_samples_leaf': 1,
+	    'clf__min_samples_split': 2,
+	    'vec__binary': True,
+	    'vec__max_df': 0.5,
+	    'vec__max_features': 5000,
+	    'vec__ngram_range': (1, 2),
+	    'vec__stop_words': None,
+        }
+    elif classifier=="SVC":
+        # Parameters for optimization of SVM
+        best_parameters = {
+	    'vec__binary': True,
+	    'vec__max_df': 0.5,
+	    'vec__max_features': 5000,
+	    'vec__ngram_range': (1, 2),
+	    'vec__stop_words': None,
+        }
+    elif classifier=="MLP":
+        best_parameters = {
+        'clf__alpha': 1,
+	    'vec__binary': False,
+	    'vec__max_df': 0.875,
+	    'vec__max_features': None,
+	    'vec__ngram_range': (1, 1),
+	    'vec__stop_words': None,
+        }
+
+    from sklearn.metrics import classification_report
+    #print("--------------------------")
+    #print("Loading training and test sets")
+    X_train = np.load(data_input_path_X_train, allow_pickle=True)
+    X_test = np.load(data_input_path_X_test, allow_pickle=True)
+    y_train = np.load(data_input_path_y_train, allow_pickle=True)
+    y_test = np.load(data_input_path_y_test, allow_pickle=True)
+
+    #print("--------------------------")
+    #print("Setting pipeline")
+    from time import time
+    pipeline.set_params(**best_parameters)
+
+    #print("--------------------------")
+    print("Fit and predict")
+    pipeline.fit(X_train, y_train)
+
+    from sklearn.metrics import accuracy_score
+    y_pred = pipeline.predict(X_test)
+
+    #print("--------------------------")
+    #print("classification_report(y_test, y_pred)")
+    print(classification_report(y_test, y_pred))
+
+
+    #print("--------------------------")
+    #print("Saving results - data pred")
+    data_pred = pd.DataFrame({'text': X_test, 'class': y_test, 'pred': y_pred})
+    out_data=build_out_data_frame(data_pred)
+
+    #save our new dataset to a file
+    out_data.to_csv(data_input_output_path, index=False, encoding='utf-8-sig')
+
+    #precision, recall, _ = precision_recall_curve(y_test, y_pred)
+    #disp = PrecisionRecallDisplay(precision=precision, recall=recall)
+    #print("accuracy_score")
+    #print(accuracy_score(y_test, y_pred))
+
+#####################################################################
+# Main
+#####################################################################
+
+for c in classifier_list:
+    classifier=c
+    execute_classifer(classifier)
+
+
+
+
+

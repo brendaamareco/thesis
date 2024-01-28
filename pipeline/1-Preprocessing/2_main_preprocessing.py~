@@ -1,0 +1,404 @@
+#####################################################################
+# Main Preprocessing
+#####################################################################
+print('Loading preprocessing libraries')
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+from pandas import DataFrame
+import numpy
+import numpy as np
+import pandas as pd
+from nltk.util import Index
+import nltk
+import string
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk
+nltk.download('stopwords')
+nltk.download('omw-1.4')
+
+from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import stopwords
+from nltk.stem.porter import *
+from nltk.tokenize.treebank import TreebankWordDetokenizer
+
+#####################################################################
+# Global Variables
+#####################################################################
+
+data_input_path = \
+    '../0-Data/1_intermediate_generated_data/data_translated.csv'
+
+data_output_path = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+
+
+from configparser import ConfigParser
+#Read config.ini file
+config_object = ConfigParser()
+config_object.read("../config.ini")
+#Get the parameters
+preprocessing_info = config_object["PREPROCESSING"]
+use_translated_reviews=format(preprocessing_info["use_translated_reviews"])
+remove_chinese_language=format(preprocessing_info["remove_chinese_language"])
+full_preprocessing=format(preprocessing_info["full_preprocessing"])
+lemmatization=format(preprocessing_info["lemmatization"])
+stemming=format(preprocessing_info["stemming"])
+remove_pk=format(preprocessing_info["remove_pk"])
+remove_sg=format(preprocessing_info["remove_sg"])
+remove_other_language=format(preprocessing_info["remove_other_language"])
+add_english_bias=format(preprocessing_info["add_english_bias"])
+
+#only for ranking test purposes
+set_ranking_as_Bug_Report=format(preprocessing_info["set_ranking_as_Bug_Report"])
+set_ranking_as_Feature_Request=format(preprocessing_info["set_ranking_as_Feature_Request"])
+set_ranking_as_Support_Request=format(preprocessing_info["set_ranking_as_Support_Request"])
+set_ranking_as_BG_o_FR=format(preprocessing_info["set_ranking_as_BG_o_FR"])
+set_ranking_as_BG_o_SR=format(preprocessing_info["set_ranking_as_BG_o_SR"])
+set_ranking_as_FR_o_SR=format(preprocessing_info["set_ranking_as_FR_o_SR"])
+set_ranking_as_BG_o_FR_o_SR=format(preprocessing_info["set_ranking_as_BG_o_FR_o_SR"])
+
+
+
+
+#print(use_translated_reviews)
+#input('Enter your input:')
+
+if use_translated_reviews=="True":
+    print("use translated reviews")
+    base_column='Translated Review'
+else:
+    print("use raw reviews")
+    base_column='Review'
+    data_input_path = \
+    '../0-Data/1_intermediate_generated_data/data.csv'
+
+#print(base_column)
+#input('Enter your input:')
+
+
+#####################################################################
+# Functions
+#####################################################################
+
+
+#####################################################################
+# Main
+#####################################################################
+
+################### Open data ##################
+data = pd.read_csv(data_input_path)
+#data = data.rename(columns={'translated review':'Translated Review'})
+
+#---------------------------------------------------
+# Rename columns to reuse code
+#---------------------------------------------------
+	
+data = data.rename(columns={'isBugReport':'finalannotationcontentcategory'})
+data = data.rename(columns={'finalcategory':'ranking'})
+data = data.rename(columns={'NotEnglish':'language'})
+data = data.rename(columns={'country':'Country'})
+data = data.rename(columns={'review_text':'Review'})
+data = data.rename(columns={'review_text':'genderfinal'})
+
+
+genderfinal
+
+print("data.shape")
+print(data.shape)
+
+
+################### NORMALISATION ##################
+
+
+#----------------------------------------------
+# test binary ranking
+#----------------------------------------------
+
+
+if set_ranking_as_Bug_Report=="True":    
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Bug Report'), "ranking"] = 1
+elif set_ranking_as_Feature_Request=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Feature Request'), "ranking"] = 1
+elif set_ranking_as_Support_Request=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Support Request'), "ranking"] = 1
+elif set_ranking_as_BG_o_FR=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Bug Report')
+     | (data['finalannotationcontentcategory']=='Feature Request'), "ranking"] = 1
+elif set_ranking_as_BG_o_SR=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Bug Report')
+     | (data['finalannotationcontentcategory']=='Support Request'), "ranking"] = 1
+elif set_ranking_as_FR_o_SR=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Feature Request')
+     | (data['finalannotationcontentcategory']=='Support Request'), "ranking"] = 1
+elif set_ranking_as_BG_o_FR_o_SR=="True":
+    data['ranking'] = 0
+    data.loc[(data['finalannotationcontentcategory']=='Bug Report')
+     | (data['finalannotationcontentcategory']=='Feature Request')
+     | (data['finalannotationcontentcategory']=='Support Request'), "ranking"] = 1
+    
+#info=data['ranking'].value_counts()
+#print(info)
+#info=data['ranking'].describe()
+#print(info)
+#input('Enter your input:')
+
+#----------------------------------------------
+# remove_chinese_language
+#----------------------------------------------
+if remove_chinese_language=="True":
+    print("remove chinese language")
+    data.drop(data.index[data['language'] == 'Chinese'], inplace=True)    
+    data.drop(data.index[data['Country'] == 'cn'], inplace=True)    
+else:
+    print("chinese language is included")
+
+#info=data['language'].value_counts()
+#print(info)
+#info=data['language'].describe()
+#print(info)
+#input('Enter your input:')
+#----------------------------------------------
+# remove_other_language
+#----------------------------------------------
+if remove_other_language=="True":
+    print("remove other language")
+    data.drop(data.index[data['language'] == 'Other'], inplace=True)    
+else:
+    print("other language is included")
+
+
+#----------------------------------------------
+# remove_pk
+#----------------------------------------------
+if remove_pk=="True":
+    print("remove_pk")
+    data.drop(data.index[data['Country'] == 'pk'], inplace=True)        
+else:
+    print("pk is included")
+
+#----------------------------------------------
+# remove_sg
+#----------------------------------------------
+if remove_sg=="True":
+    print("remove_sg")
+    data.drop(data.index[data['Country'] == 'sg'], inplace=True)        
+else:
+    print("sg is included")
+
+
+#----------------------------------------------
+# remove_no_annotated_ranking_reviews
+#----------------------------------------------
+data = data[(data['ranking'] == 0) | (data['ranking'] == 1)]
+
+#----------------------------------------------
+# filling null values in Likes and Dislikes to 0
+#----------------------------------------------
+#data['Likes'] = data['Likes'].fillna(0)
+#data['Dislikes'] = data['Dislikes'].fillna(0)
+
+#----------------------------------------------
+# remove no translated reviews
+#----------------------------------------------
+#data = data[data['Translated Review'] != 'no translated']
+
+#----------------------------------------------
+# remove stop words
+#----------------------------------------------
+def remove_stopwords(text):
+    """custom function to remove the stopwords"""
+    return " ".join([word for word in str(text).split() if word not in STOPWORDS])
+
+", ".join(stopwords.words('english'))
+STOPWORDS = set(stopwords.words('english'))
+
+data['preprocessed_review']= data[base_column].apply(lambda text: remove_stopwords(text))
+# print(data['preprocessed_review'])
+
+
+#----------------------------------------------
+# annotate binary category score 1,0
+#----------------------------------------------
+if add_english_bias=="True":
+    print("add_english_bias")
+    #info=data['ranking'].value_counts()
+    #print(info)
+    #info=data['ranking'].describe()
+    #print(info)
+    #add_english_bias
+    #1.0    1165
+    #0.0    1075
+    data['ranking']=0.0
+    data.loc[(data['language']=='English'), 'ranking']= 1.0
+    #print("after add bias")
+    #info=data['ranking'].value_counts()
+    #print(info)
+    #info=data['ranking'].describe()
+    #print(info)
+    #input('Enter your input:')
+    #after add bias
+    #1.0    1724
+    #0.0     516
+
+
+
+#print(data['finalannotationcontentcategory'].dtypes) 
+#data.loc[(data['finalannotationcontentcategory']=='Feature Request') | (data['finalannotationcontentcategory']=='Bug Report') | (data['finalannotationcontentcategory']=='Support Request'), "category score"] = '1'
+#data.loc[(data['finalannotationcontentcategory']=='Other'), 'category score']= '0'
+#print(data['category score'].dtype)
+#print(data['category score'])
+   
+
+################# PREPROCESSING ###############
+if full_preprocessing=="True":
+    print("perform full preprocessing")
+    #----------------------------------------------
+    # remove white space
+    #----------------------------------------------
+    def whitespace(text):
+        return re.sub(r"\s+", " ", text)
+
+    data['preprocessed_review']= data['preprocessed_review'].apply(lambda text: whitespace(text))
+
+
+    #----------------------------------------------
+    # remove punctations
+    #----------------------------------------------
+    def remove_punctuation(text):
+        """custom function to remove the punctuation"""
+        punctuation_remove = string.punctuation
+        return text.translate(str.maketrans('', '', punctuation_remove))
+
+
+    data["preprocessed_review"] = data["preprocessed_review"].apply(lambda text: remove_punctuation(text))
+    #print(data.head())
+
+
+    #----------------------------------------------
+    # tokenise and lower case
+    #----------------------------------------------
+    def tokenization(text):
+        text = re.split('\W+', text)
+        return text
+
+    data['preprocessed_review'] = data['preprocessed_review'].apply(lambda x: tokenization(x.lower()))
+
+
+    #----------------------------------------------
+    #  lemmatizer / stemer
+    #----------------------------------------------
+    nltk.download('wordnet')
+    wn = nltk.WordNetLemmatizer()
+    def lemmatizer(text):
+        text = [wn.lemmatize(word) for word in text]
+        return text
+
+    from nltk.stem import PorterStemmer
+    from nltk.tokenize import word_tokenize
+    ps = PorterStemmer()
+    def stemer(text):
+        text = [ps.stem(word) for word in text]
+        return text
+
+    if lemmatization=="True":
+        print("using lemmatizer")
+        data['preprocessed_review'] = data['preprocessed_review'].apply(lambda x: lemmatizer(x))
+        
+    if stemming=="True":
+        print("using stemming")
+        data['preprocessed_review'] = data['preprocessed_review'].apply(lambda x: stemer(x))
+        
+
+    #reviews = data['preprocessed_review'].to_string
+
+    data['preprocessed_review']=data['preprocessed_review'].apply(','.join)
+    data['preprocessed_review'] = data['preprocessed_review'].replace(',',' ', regex=True)
+    #print(data.head())
+
+
+    #----------------------------------------------
+    # remove reviews less than 3
+    #----------------------------------------------
+    data['length of review'] = data['preprocessed_review'].apply(lambda x: len(x.split()))
+    #print(data['length of review'])
+
+    df_temp = data[data['length of review']<3]
+    # df = data.drop(df_temp, inplace=True)
+    # print(df_temp)
+    data = data.drop(labels=df_temp.index, axis=0)
+    data.reset_index(drop=True, inplace=True)
+
+    print("data.shape after removing length less than 3")
+    print(data.shape)
+    # detoken = TreebankWordDetokenizer()
+    # detoken.detokenize(df_new)
+
+    #----------------------------------------------
+    # remove chinese characters in translated reviews
+    #----------------------------------------------
+    import re
+    def strip_chinese(string):
+        en_list = re.findall(u'[^\u4E00-\u9FA5]', string)
+        for c in string:
+            if c not in en_list:
+                string = string.replace(c, '')
+        return string
+
+    data['preprocessed_review']= data['preprocessed_review'].apply(lambda text: strip_chinese(text))
+
+
+    #----------------------------------------------
+    # drop duplicates
+    #----------------------------------------------
+
+    #col_list = data['preprocessed_review'].tolist()
+    #import collections
+    #print("list of duplicated comments")
+    #print([(item,count) for item, count in collections.Counter(col_list).items() if count > 1])
+
+    #print("data.shape ")
+    #print(data.shape)    
+    
+    #drop duplicates of comments from the same country
+    data = data.drop_duplicates(subset=['preprocessed_review', 'Country'], keep='first')
+    #drop remaining duplicates:
+    #[('i love app', 3), ('veri good app', 2), ('it good app', 2)]
+    data = data.drop_duplicates(subset=['preprocessed_review'], keep='first')
+
+
+    #print("data.shape after remove duplicates")
+    #print(data.shape)
+    #print("list of duplicated comments after removing")
+    #col_list = data['preprocessed_review'].tolist()
+    #print([(item,count) for item, count in collections.Counter(col_list).items() if count > 1])
+
+    
+    #input("press enter")
+    #data.shape 
+    #(2351, 75)
+    #data.shape after remove duplicates
+    #(2340, 75)
+
+    
+else:
+    print("no full preprocessing carried out")
+
+
+
+#----------------------------------------------
+# save results
+#----------------------------------------------
+df= pd.DataFrame(data)
+df.to_csv(data_output_path, index=False, encoding='utf-8-sig')
+
+

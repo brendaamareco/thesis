@@ -1,0 +1,123 @@
+#####################################################################
+# Split train and test
+#####################################################################
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+from pandas import DataFrame
+import numpy
+import numpy as np
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import
+
+#####################################################################
+# Global Variables
+#####################################################################
+data_input_path = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+
+from configparser import ConfigParser
+#Read config.ini file
+config_object = ConfigParser()
+config_object.read("../config.ini")
+#Get the parameters
+preprocessing_info = config_object["PREPROCESSING"]
+train_size_param=float(format(preprocessing_info["train_size_param"]))
+#print(train_size_param)
+#print(type(train_size_param))
+#input('Enter your input:')
+
+data_output_path_X_train = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_train.npy'
+data_output_path_y_train = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_train.npy'
+data_output_path_X_test = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_test.npy'
+data_output_path_y_test = \
+    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_test.npy'
+
+#train_size float or int, default=None
+#If float, should be between 0.0 and 1.0 
+#test_size float or int, default=None
+#If None, the value is set to the complement of the train size.
+
+
+#####################################################################
+# Functions
+#####################################################################
+def build_data_frame():
+    print('-------------------------')
+    print('Opening Data')
+    df = pd.read_csv(data_input_path)
+
+    rows = []
+    index = []
+    
+    for i, row in df.iterrows():
+        #rows.append({'text': row['translated review'], 'class': int(row['ranking'])})
+        rows.append({'text': row['preprocessed_review'], 'class': int(row['ranking'])})
+        index.append(i)
+    
+    data_frame = DataFrame(rows, index=index)
+    
+    print('-------------------------')
+    print("original shape")
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+
+
+    data_frame = data_frame.dropna()
+
+    print('-------------------------')
+    print("shape afted deleting na values")
+    r, c = data_frame.shape
+    print("rows "+str(r)+" columns "+str(c))    
+    
+
+    print('-------------------------')
+    print('class/number of instances:')        
+    info=data_frame['class'].value_counts()
+    print(info)
+    
+    return data_frame
+
+#####################################################################
+# Main
+#####################################################################
+
+print("-----------------------")
+print("Splitting")
+data = DataFrame({'text': [], 'class': []})
+data = pd.concat([data, build_data_frame()], axis=0)
+data = data.reindex(numpy.random.permutation(data.index))
+
+#X_train, X_test, y_train, y_test = train_test_split(data['text'].values, data['class'].values,random_state=100000, train_size=train_size_param) #no bias found
+X_train, X_test, y_train, y_test = train_test_split(data['text'].values, data['class'].values, shuffle=True, random_state=100, train_size=train_size_param)
+
+#shufflebool, default=True
+#https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
+#As soon as you set shuffle to True, random_state is used as seed for the random number generator. 
+
+print("X_train.shape")
+print(X_train.shape)
+print("X_test.shape")
+print(X_test.shape)
+
+
+print("-----------------------")
+print("Saving")
+np.save(data_output_path_X_train, X_train, allow_pickle=True)    # .npy extension is added if not given
+np.save(data_output_path_X_test, X_test, allow_pickle=True)    # .npy extension is added if not given
+np.save(data_output_path_y_train, y_train, allow_pickle=True)    # .npy extension is added if not given
+np.save(data_output_path_y_test, y_test, allow_pickle=True)    # .npy extension is added if not given
+
+
+#d = np.load('test3.npy')
+#a == d
+
+
+
+
+
+

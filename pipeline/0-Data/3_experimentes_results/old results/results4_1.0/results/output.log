@@ -1,0 +1,144 @@
+------------------------------------------------
+1 - Preprocessing
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/1-Preprocessing
+no full preprocessing carried out
+------------------------------------------------
+2 - Feature Extracion
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/2-FeatureExtraction
+no feature extration carried out
+------------------------------------------------
+4 - Ranking
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/4-Ranking
+working with annotated ranking dataset
+perform rankingFunciondePesos
+Using features:  ['CATEGORY', 'SENTIMENT', 'SCORE', 'ENTROPY']
+Using decimal precision: 1.0
+Number of combinations found:  4
+------------------------------------------------
+5-QualityTesting
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/5-QualityTesting
+perform evaluarNDCG
+--------------------------------------------------
+Load dataset 
+--------------------------------------------------
+Perfect ranking ----------------------------------
+dcg_score: 41.48105344537508
+ndcg_score: 1.0000000000000002
+--------------------------------------------------
+Alertme normalizado ranking -------------------------------------
+dcg_score: 39.170176161868596
+ndcg_score: 0.9442907763528814
+--------------------------------------------------
+Ranking con Funcion de pesos
+Best ranking based on ndcg_score: 
+RankingID: rank3, ndcg: 0.9569445916781542
+--------------------------------------------------
+------------------------------------------------
+6-BiasTesting
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/6-BiasTesting
+WARNING:root:
+`load_boston` has been removed from scikit-learn since version 1.2.
+
+The Boston housing prices dataset has an ethical problem: as
+investigated in [1], the authors of this dataset engineered a
+non-invertible variable "B" assuming that racial self-segregation had a
+positive impact on house prices [2]. Furthermore the goal of the
+research that led to the creation of this dataset was to study the
+impact of air quality but it did not give adequate demonstration of the
+validity of this assumption.
+
+The scikit-learn maintainers therefore strongly discourage the use of
+this dataset unless the purpose of the code is to study and educate
+about ethical issues in data science and machine learning.
+
+In this special case, you can fetch the dataset from the original
+source::
+
+    import pandas as pd
+    import numpy as np
+
+    data_url = "http://lib.stat.cmu.edu/datasets/boston"
+    raw_df = pd.read_csv(data_url, sep="\s+", skiprows=22, header=None)
+    data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+    target = raw_df.values[1::2, 2]
+
+Alternative datasets include the California housing dataset and the
+Ames housing dataset. You can load the datasets as follows::
+
+    from sklearn.datasets import fetch_california_housing
+    housing = fetch_california_housing()
+
+for the California housing dataset and::
+
+    from sklearn.datasets import fetch_openml
+    housing = fetch_openml(name="house_prices", as_frame=True)
+
+for the Ames housing dataset.
+
+[1] M Carlisle.
+"Racist data destruction?"
+<https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>
+
+[2] Harrison Jr, David, and Daniel L. Rubinfeld.
+"Hedonic housing prices and the demand for clean air."
+Journal of environmental economics and management 5.1 (1978): 81-102.
+<https://www.researchgate.net/publication/4974606_Hedonic_housing_prices_and_the_demand_for_clean_air>
+: LawSchoolGPADataset will be unavailable. To install, run:
+pip install 'aif360[LawSchoolGPA]'
+2023-10-09 21:40:23.575345: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2023-10-09 21:40:23.634065: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2023-10-09 21:40:23.634430: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-10-09 21:40:24.333013: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+-----------------------------------
+force_binary_label_for_bias_testing
+-----------------------------------
+label before forcing binary label
+rank3
+0.0    77
+1.5    48
+3.0    35
+Name: count, dtype: int64
+160
+label after forcing binary label
+rank3
+0.0    125
+1.0     35
+Name: count, dtype: int64
+160
+-----------------------------------
+country_bias_testing
+-----------------------------------
+--------------------------------
+Generating ../0-Data/results/out_bias_country_x1_whole.csv
+------------------------------------------------
+6.2-QualityTesting
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/5-QualityTesting
+perform evaluarNDCG
+--------------------------------------------------
+Load dataset 
+--------------------------------------------------
+Perfect ranking ----------------------------------
+dcg_score: 41.48105344537508
+ndcg_score: 1.0000000000000002
+--------------------------------------------------
+Alertme normalizado ranking -------------------------------------
+dcg_score: 39.170176161868596
+ndcg_score: 0.9442907763528814
+--------------------------------------------------
+Ranking con Funcion de pesos
+Best ranking based on ndcg_score: 
+RankingID: rank3Australia, ndcg: 0.9333103093404571
+--------------------------------------------------
+------------------------------------------------
+7-Statistics
+------------------------------------------------
+/home/brenda/Environment/venvBrenda/repo/thesisbrenda/pipeline/7-Statistics
+Saving 7 x 7 in image
+End of experiment 4

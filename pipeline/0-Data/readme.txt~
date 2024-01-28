@@ -1,0 +1,20 @@
+Anna_finalannotations_no_blanks_translated.csv
+was obtained with the script join_files_by_ReviewID.py
+which adds translated reviews calculated by Mansi to Anna's annotations
+
+These are some numbers describing the translation
+Before join
+rows 2996 columns 78
+After join
+rows 2996 columns 79
+
+not translated review 204
+
+Name: translated review, dtype: object
+count              2996
+unique             2730
+top       no translated
+freq                204
+
+
+

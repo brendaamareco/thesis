@@ -1,0 +1,144 @@
+#!/bin/bash
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+config_file='../config.ini'
+. $config_file
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+if [[ "$translate" == "True" ]]
+then
+    echo "translating reviews: join with translated file"
+    #data_input_path = \
+    #    '../0-Data/1_intermediate_generated_data/data.csv'
+    #rows 3111 columns 73
+
+    #data_input_path2 = \
+    #    '../0-Data/concat_files_all_translated_reviews.csv'
+
+    data_output_path='../0-Data/1_intermediate_generated_data/data_translated.csv'
+    data_output_path2='../0-Data/1_intermediate_generated_data/data_translated_backup.csv'
+    #rows 3111 columns 74
+
+    rm -f $data_output_path
+    python3.9 1_add_translated_reviews_join_csv_by_ReviewID.py
+    
+    echo "copy translated file to backup to further experiments"
+    cp $data_output_path $data_output_path2
+    
+else
+    echo "no translation file used, no join performed"
+    path1='../0-Data/1_intermediate_generated_data/data.csv'
+    
+    cp data.csv data_translated.csv
+fi
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+#data_input_path = \
+#    '../0-Data/1_intermediate_generated_data/data_translated.csv'
+#(3111, 74)
+
+data_output_path='../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+#(2473, 76)    
+rm -f $data_output_path
+echo "2_main_preprocessing.py"
+python3.9 2_main_preprocessing.py
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+data_output_path_X_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_train.npy'
+data_output_path_y_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_train.npy'
+data_output_path_X_test='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_test.npy'
+data_output_path_y_test='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_test.npy'
+rm -f $data_output_path_X_train
+rm -f $data_output_path_y_train
+rm -f $data_output_path_X_test
+rm -f $data_output_path_y_test
+echo "3_split_train_test.py"
+python3.9 3_split_train_test.py 
+#class/number of instances:
+#1    1465
+#0    1008
+#X_train.shape (1236,)
+#X_test.shape (1237,)
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+if [[ "$smote" == "True" ]]
+then
+    echo "smote performing smote"
+    #read stop
+
+    data_input_path_X_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_train.npy'
+    data_input_path_y_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_train.npy'
+
+    data_output_path_X_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_smote_X_train.npy'
+    data_output_path_y_train='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_smote_y_train.npy'
+
+    rm -f $data_output_path_X_train
+    rm -f $data_output_path_y_train
+    echo "4_smote.py"
+    python3.9 4_smote.py
+
+    cp $data_output_path_X_train $data_input_path_X_train
+    cp $data_output_path_y_train $data_input_path_y_train
+     
+    #X_train.shape (1236, 3933)
+    #Before OverSampling, counts of label '1': 751
+    #Before OverSampling, counts of label '0': 485 
+
+    #After OverSampling, the shape of train_X: (1502, 3934)
+    #After OverSampling, counts of label '1': 751
+    #After OverSampling, counts of label '0': 751
+
+else
+    echo "no smote performed"
+fi
+
+cp $data_output_path_X_train '../0-Data/biasresults'
+cp $data_output_path_y_train '../0-Data/biasresults'
+cp $data_output_path_X_test '../0-Data/biasresults'
+cp $data_output_path_y_test '../0-Data/biasresults'
+
+#------------------------------------------------
+#------------------------------------------------
+#------------------------------------------------
+
+#data_input_path = \
+#    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed.csv'
+#data_input_path_X_test = \
+#    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_X_test.npy'
+#data_input_path_y_test = \
+#    '../0-Data/1_intermediate_generated_data/data_translated_preprocessed_y_test.npy'
+
+data_output_path='../0-Data/1_intermediate_generated_data/data_translated_preprocessed_predicted_test.csv'
+rm -f $data_output_path
+echo "5_generate_full_test_dataset.py"
+python3.9 5_generate_full_test_dataset.py
+
+cp $data_output_path '../0-Data/biasresults'
+
+#Complete Test shape
+#rows 1237 columns 76
+#                     Date  ...  length of review
+#0     2019-11-20 16:36:53  ...                22
+#1     2020-01-05 15:59:33  ...                15
+#...                   ...  ...               ...
+#1235  2019-09-28 06:17:29  ...                27
+#1236  2019-10-16 16:16:21  ...                20
+#
+#[1237 rows x 76 columns]
+
+
+

@@ -1,0 +1,178 @@
+#####################################################################
+# Smote
+#####################################################################
+import pandas as pd 
+import csv
+import sys
+import math
+from collections import Counter
+from pandas import DataFrame
+import numpy
+import numpy as np
+from sklearn.model_selection import train_test_split #from sklearn.cross_validation import
+from imblearn.over_sampling import SMOTE
+#SMOTE: Synthetic Minority Over-sampling Technique
+#N. V. Chawla, K. W. Bowyer, L. O. Hall, W. P. Kegelmeyer
+#https://arxiv.org/pdf/1106.1813.pdf
+#https://stackoverflow.com/questions/67287472/how-can-i-find-whether-my-dataset-is-balanced-or-not
+#https://towardsdatascience.com/how-to-deal-with-imbalanced-data-in-python-f9b71aba53eb
+#https://github.com/scikit-learn-contrib/imbalanced-learn/blob/master/examples/over-sampling/plot_comparison_over_sampling.py
+#https://www.geeksforgeeks.org/ml-handling-imbalanced-data-with-smote-and-near-miss-algorithm-in-python/#:~:text=SMOTE%20(synthetic%20minority%20oversampling%20technique)%20is%20one%20of%20the%20most,instances%20between%20existing%20minority%20instances.
+
+
+#----------------------------------------------
+# import SMOTE module from imblearn library
+# pip install imblearn (if you don't have imblearn in your system)
+from imblearn.over_sampling import SMOTE
+#----------------------------------------------
+
+
+#####################################################################
+# Global Variables
+#####################################################################
+data_input_path_X_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_X_train.npy'
+data_input_path_y_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_y_train.npy'
+
+
+data_output_path_X_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_smote_X_train.npy'
+data_output_path_y_train = \
+    '../0-Data/Anna_finalannotations_translated_preprocessed_smote_y_train.npy'
+
+#####################################################################
+# Functions
+#####################################################################
+
+
+
+#####################################################################
+# Main
+#####################################################################
+print("--------------------------")
+print("Loading train sets")
+X_train = np.load(data_input_path_X_train, allow_pickle=True)
+originalX_train = X_train
+y_train = np.load(data_input_path_y_train, allow_pickle=True)
+
+#print("X_train.shape")
+#print(X_train.shape) #(1498,)
+#print(type(X_train)) #<class 'numpy.ndarray'>
+#print("y_train.shape")
+#print(y_train.shape) #(1498,)
+#print(type(y_train)) #<class 'numpy.ndarray'>
+
+#print("first comment:")
+#print(X_train[0])
+#print("comment 63:")
+#print(X_train[63])
+
+#print("")
+#print("Before OverSampling, counts of label '1': {}".format(sum(y_train == 1)))
+#print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train == 0)))
+
+
+#convert to matrix
+from sklearn.feature_extraction.text import CountVectorizer
+vectorizer = CountVectorizer()
+vectorizer.fit(X_train)
+X_train=vectorizer.transform(X_train)
+X_train=X_train.toarray()
+X_train = pd.DataFrame(X_train)
+#print("matrix converted")
+#print("X_train.shape")
+#print(X_train.shape) #(1498, 4187)
+#print(type(X_train)) #<class 'pandas.core.frame.DataFrame'>
+
+#add a new columns as id or index, to recover original comments at the end
+print("")
+print("add a new columns as id or index")
+X_train['id'] = range(0, len(X_train))
+
+print("matrix converted")
+print("X_train.shape")
+print(X_train.shape) #(1498, 4188)
+print(type(X_train)) #<class 'pandas.core.frame.DataFrame'>
+
+
+########################
+# Smote
+########################
+sm = SMOTE(random_state = 2)
+X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
+print("")
+print("after resample")
+print("type(X_train_res)")
+print(type(X_train_res)) #<class 'pandas.core.frame.DataFrame'>
+print(X_train_res.shape) #(1522, 4188)
+  
+print('After OverSampling, the shape of train_X: {}'.format(X_train_res.shape))
+print('After OverSampling, the shape of train_y: {} \n'.format(y_train_res.shape))
+  
+print("After OverSampling, counts of label '1': {}".format(sum(y_train_res == 1)))
+print("After OverSampling, counts of label '0': {}".format(sum(y_train_res == 0)))
+#print(X_train_res)
+
+#-------------------------------------------------
+#convet sampled id to original comments
+#-------------------------------------------------
+
+#It imposible to recover original data from vectorized matrix
+#X_train_res=vectorizer.inverse_transform(X_train_res)
+#print("X_train_res len")
+#print(len(X_train_res)) #1522
+#print(type(X_train_res)) #<class 'list'>
+#print(X_train_res)
+#[array(['no', 'translated'], dtype='<U42'), 
+#  array([], dtype='<U42'), 
+#  array(['like', 'so'], dtype='<U42'), 
+#  array([], dtype='<U42')]
+
+#so, we have to create the array again using the index/id column 
+
+
+#print("originalX_train[0]")
+#print(originalX_train[0])
+#print("originalX_train[1]")
+#print(originalX_train[1])
+
+#import collections
+#print([(item,count) for item, count in collections.Counter(originalX_train).items() if count > 1])
+
+X_train_res_comments= []
+for i, row in X_train_res.iterrows():
+        index=row['id']
+        #print("index=row['id']")
+        #print(index)        
+        X_train_res_comments.append(originalX_train[index])
+        #print(originalX_train[index])
+        #input("guachin") 
+#print(X_train_res_comments)
+#input("Press Enter to continue...")
+
+X_train_res_comments=np.array(X_train_res_comments)        
+print("X_train_res_comments")
+print(X_train_res_comments.shape) #
+print(type(X_train_res_comments)) #<class 'numpy.ndarray'>
+print("first comment:")
+print(X_train_res_comments[0])
+print("last comment:")
+print(X_train_res_comments[len(X_train_res_comments)-1])
+    
+print("")    
+print("X_train_res_comments.shape")
+print(X_train_res_comments.shape)
+print("y_train_res.shape")
+print(y_train_res.shape)
+
+print("-----------------------")
+print("Saving")
+np.save(data_output_path_X_train, X_train_res_comments, allow_pickle=True)    # .npy extension is added if not given
+np.save(data_output_path_y_train, y_train_res, allow_pickle=True)    # .npy extension is added if not given
+
+
+
+
+
+
